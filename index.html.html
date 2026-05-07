@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aprende Jugando 🌟</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 16px;
+  }
+  .app { max-width: 680px; margin: 0 auto; }
+  .header { text-align: center; margin-bottom: 20px; }
+  .header h1 { font-family: 'Fredoka One', cursive; font-size: 32px; color: #fff; text-shadow: 3px 3px 0px rgba(0,0,0,0.2); letter-spacing: 1px; }
+  .header p { color: rgba(255,255,255,0.85); font-size: 15px; font-weight: 600; margin-top: 4px; }
+  .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .menu-card { background: #fff; border-radius: 20px; padding: 24px 16px; text-align: center; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 6px 20px rgba(0,0,0,0.15); border: none; width: 100%; }
+  .menu-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,0.2); }
+  .menu-card:active { transform: scale(0.97); }
+  .menu-icon { font-size: 44px; margin-bottom: 10px; display: block; }
+  .menu-title { font-family: 'Fredoka One', cursive; font-size: 18px; color: #333; margin-bottom: 4px; }
+  .menu-sub { font-size: 12px; color: #888; font-weight: 600; }
+  .card-letras { background: linear-gradient(135deg, #fff9c4, #fff); border: 3px solid #FFD600; }
+  .card-palabras { background: linear-gradient(135deg, #e8f5e9, #fff); border: 3px solid #4CAF50; }
+  .card-oraciones { background: linear-gradient(135deg, #e3f2fd, #fff); border: 3px solid #2196F3; }
+  .card-dictado { background: linear-gradient(135deg, #fce4ec, #fff); border: 3px solid #E91E63; }
+  .game-screen { background: #fff; border-radius: 24px; padding: 24px 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.2); display: none; }
+  .game-screen.active { display: block; }
+  .game-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .btn-back { background: #f0f0f0; border: none; border-radius: 12px; padding: 8px 14px; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; color: #555; transition: background 0.15s; }
+  .btn-back:hover { background: #e0e0e0; }
+  .game-title { font-family: 'Fredoka One', cursive; font-size: 22px; color: #333; }
+  .score-badge { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; border-radius: 12px; padding: 6px 14px; font-weight: 800; font-size: 15px; }
+  .timer-bar-wrap { background: #f0f0f0; border-radius: 10px; height: 14px; margin-bottom: 8px; overflow: hidden; }
+  .timer-bar { height: 100%; border-radius: 10px; transition: width 1s linear, background 0.5s; background: #4CAF50; }
+  .timer-label { text-align: right; font-weight: 700; font-size: 13px; color: #888; margin-bottom: 16px; }
+  .question-area { text-align: center; margin-bottom: 20px; }
+  .question-img { font-size: 72px; line-height: 1; margin-bottom: 8px; animation: bounce 0.5s ease; }
+  @keyframes bounce { 0% { transform: scale(0.5); opacity: 0; } 70% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+  .question-text { font-family: 'Fredoka One', cursive; font-size: 26px; color: #333; margin-bottom: 6px; }
+  .question-hint { font-size: 14px; color: #888; font-weight: 600; }
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .option-btn { background: #f8f9fa; border: 3px solid #e0e0e0; border-radius: 16px; padding: 16px 10px; font-family: 'Fredoka One', cursive; font-size: 22px; cursor: pointer; transition: all 0.15s; color: #333; }
+  .option-btn:hover { border-color: #667eea; background: #f0f0ff; transform: scale(1.03); }
+  .option-btn.correct { background: #e8f5e9; border-color: #4CAF50; color: #2e7d32; animation: pop 0.3s ease; }
+  .option-btn.wrong { background: #ffebee; border-color: #f44336; color: #c62828; animation: shake 0.3s ease; }
+  .option-btn:disabled { cursor: default; }
+  @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.12)} 100%{transform:scale(1)} }
+  @keyframes shake { 0%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} 100%{transform:translateX(0)} }
+  .input-area { margin-bottom: 16px; }
+  .input-area input { width: 100%; border: 3px solid #e0e0e0; border-radius: 16px; padding: 14px 16px; font-family: 'Fredoka One', cursive; font-size: 24px; text-align: center; color: #333; outline: none; transition: border-color 0.2s; }
+  .input-area input:focus { border-color: #667eea; }
+  .input-area input.correct { border-color: #4CAF50; background: #e8f5e9; color: #2e7d32; }
+  .input-area input.wrong { border-color: #f44336; background: #ffebee; color: #c62828; }
+  .btn-check { width: 100%; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; border: none; border-radius: 16px; padding: 14px; font-family: 'Fredoka One', cursive; font-size: 20px; cursor: pointer; transition: opacity 0.15s, transform 0.15s; margin-bottom: 8px; }
+  .btn-check:hover { opacity: 0.9; transform: scale(1.02); }
+  .btn-check:active { transform: scale(0.98); }
+  .feedback-msg { text-align: center; font-family: 'Fredoka One', cursive; font-size: 20px; min-height: 32px; margin-bottom: 8px; transition: all 0.3s; }
+  .feedback-msg.correct { color: #4CAF50; }
+  .feedback-msg.wrong { color: #f44336; }
+  .progress-dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: #e0e0e0; transition: background 0.3s; }
+  .dot.done { background: #4CAF50; }
+  .dot.current { background: #667eea; transform: scale(1.3); }
+  .dot.wrong-dot { background: #f44336; }
+  .results-screen { text-align: center; padding: 10px 0; }
+  .results-emoji { font-size: 72px; margin-bottom: 12px; animation: bounce 0.5s ease; }
+  .results-title { font-family: 'Fredoka One', cursive; font-size: 28px; color: #333; margin-bottom: 8px; }
+  .results-sub { font-size: 16px; color: #666; margin-bottom: 20px; font-weight: 600; }
+  .results-stats { display: flex; justify-content: center; gap: 20px; margin-bottom: 24px; }
+  .stat-box { background: #f8f9fa; border-radius: 16px; padding: 14px 20px; min-width: 80px; }
+  .stat-num { font-family: 'Fredoka One', cursive; font-size: 32px; }
+  .stat-lbl { font-size: 12px; color: #888; font-weight: 700; margin-top: 2px; }
+  .btn-play-again { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; border: none; border-radius: 16px; padding: 14px 32px; font-family: 'Fredoka One', cursive; font-size: 20px; cursor: pointer; margin-right: 10px; transition: opacity 0.15s; }
+  .btn-play-again:hover { opacity: 0.9; }
+  .btn-menu { background: #f0f0f0; color: #555; border: none; border-radius: 16px; padding: 14px 24px; font-family: 'Fredoka One', cursive; font-size: 20px; cursor: pointer; transition: background 0.15s; }
+  .btn-menu:hover { background: #e0e0e0; }
+  .level-sel { display: flex; gap: 8px; margin-bottom: 18px; justify-content: center; }
+  .level-btn { border: 2px solid #e0e0e0; background: #f8f9fa; border-radius: 12px; padding: 6px 16px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px; cursor: pointer; color: #666; transition: all 0.15s; }
+  .level-btn.active { border-color: #667eea; background: #f0f0ff; color: #667eea; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1>🌟 Aprende Jugando 🌟</h1>
+    <p>¡Ejercicios divertidos de lectura y escritura!</p>
+    <p style="margin-top:6px; font-size:13px; color:rgba(255,255,255,0.6); font-weight:600; letter-spacing:0.5px;">by Mitchael Arpoulet</p>
+  </div>
+
+  <div id="menu-screen">
+    <div class="menu-grid">
+      <button class="menu-card card-letras" onclick="startGame('letras')">
+        <span class="menu-icon">🔤</span>
+        <div class="menu-title">Letras</div>
+        <div class="menu-sub">Reconoce las letras</div>
+      </button>
+      <button class="menu-card card-palabras" onclick="startGame('palabras')">
+        <span class="menu-icon">🗣️</span>
+        <div class="menu-title">Palabras</div>
+        <div class="menu-sub">Lee y escoge</div>
+      </button>
+      <button class="menu-card card-oraciones" onclick="startGame('oraciones')">
+        <span class="menu-icon">📖</span>
+        <div class="menu-title">Oraciones</div>
+        <div class="menu-sub">Completa la frase</div>
+      </button>
+      <button class="menu-card card-dictado" onclick="startGame('dictado')">
+        <span class="menu-icon">✏️</span>
+        <div class="menu-title">Escritura</div>
+        <div class="menu-sub">Escribe la palabra</div>
+      </button>
+    </div>
+  </div>
+
+  <div class="game-screen" id="game-screen">
+    <div class="game-header">
+      <button class="btn-back" onclick="goMenu()">← Menú</button>
+      <div class="game-title" id="game-title">Letras</div>
+      <div class="score-badge">⭐ <span id="score-val">0</span></div>
+    </div>
+    <div class="level-sel">
+      <button class="level-btn active" onclick="setLevel(1,this)">🐣 Fácil</button>
+      <button class="level-btn" onclick="setLevel(2,this)">🦊 Medio</button>
+      <button class="level-btn" onclick="setLevel(3,this)">🦅 Difícil</button>
+    </div>
+    <div class="timer-bar-wrap">
+      <div class="timer-bar" id="timer-bar" style="width:100%"></div>
+    </div>
+    <div class="timer-label">⏱️ <span id="timer-text">15</span>s</div>
+    <div class="progress-dots" id="progress-dots"></div>
+    <div class="question-area">
+      <div class="question-img" id="q-img"></div>
+      <div class="question-text" id="q-text"></div>
+      <div class="question-hint" id="q-hint"></div>
+    </div>
+    <div class="options-grid" id="options-area"></div>
+    <div class="input-area" id="input-area" style="display:none">
+      <input type="text" id="text-input" placeholder="Escribe aquí..." autocomplete="off" autocorrect="off" spellcheck="false" />
+    </div>
+    <div class="feedback-msg" id="feedback"></div>
+    <button class="btn-check" id="btn-check" style="display:none" onclick="checkInput()">Comprobar ✔</button>
+    <div class="results-screen" id="results-screen" style="display:none">
+      <div class="results-emoji" id="res-emoji">🏆</div>
+      <div class="results-title" id="res-title">¡Increíble!</div>
+      <div class="results-sub" id="res-sub">Completaste el ejercicio</div>
+      <div class="results-stats">
+        <div class="stat-box"><div class="stat-num" id="res-correct" style="color:#4CAF50">0</div><div class="stat-lbl">Correctas</div></div>
+        <div class="stat-box"><div class="stat-num" id="res-wrong" style="color:#f44336">0</div><div class="stat-lbl">Errores</div></div>
+        <div class="stat-box"><div class="stat-num" id="res-score" style="color:#667eea">0</div><div class="stat-lbl">Puntos</div></div>
+      </div>
+      <button class="btn-play-again" onclick="restartGame()">🔄 Otra vez</button>
+      <button class="btn-menu" onclick="goMenu()">🏠 Menú</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const GAMES = {
+  letras: {
+    title: '🔤 Letras', type: 'multiple', timePerQ: [15, 10, 7],
+    questions: [
+      { img: '🍎', text: '¿Con qué letra empieza?', answer: 'A', options: ['A','B','C','D'] },
+      { img: '🐘', text: '¿Con qué letra empieza?', answer: 'E', options: ['I','E','O','U'] },
+      { img: '🦁', text: '¿Con qué letra empieza?', answer: 'L', options: ['M','N','L','R'] },
+      { img: '🐟', text: '¿Con qué letra empieza?', answer: 'P', options: ['P','F','B','T'] },
+      { img: '🌙', text: '¿Con qué letra empieza?', answer: 'L', options: ['S','M','L','N'] },
+      { img: '🦋', text: '¿Con qué letra empieza?', answer: 'M', options: ['M','P','B','F'] },
+      { img: '🍌', text: '¿Con qué letra empieza?', answer: 'B', options: ['V','B','P','D'] },
+      { img: '🦊', text: '¿Con qué letra empieza?', answer: 'Z', options: ['S','Z','X','C'] },
+    ]
+  },
+  palabras: {
+    title: '🗣️ Palabras', type: 'multiple', timePerQ: [18, 12, 8],
+    questions: [
+      { img: '🐶', text: '¿Cómo se llama este animal?', answer: 'PERRO', options: ['GATO','PERRO','PATO','OSO'] },
+      { img: '🏠', text: '¿Qué palabra corresponde?', answer: 'CASA', options: ['MESA','SILLA','CASA','PUERTA'] },
+      { img: '🌞', text: '¿Qué palabra es?', answer: 'SOL', options: ['LUZ','SOL','LUNA','RAYO'] },
+      { img: '🌸', text: '¿Cómo se llama?', answer: 'FLOR', options: ['ÁRBOL','HIERBA','FLOR','HOJA'] },
+      { img: '🐱', text: '¿Cuál es la palabra correcta?', answer: 'GATO', options: ['GATO','RATA','ZORRO','LOBO'] },
+      { img: '🚗', text: '¿Qué es esto?', answer: 'CARRO', options: ['MOTO','BUS','TREN','CARRO'] },
+      { img: '📚', text: '¿Cómo se llama?', answer: 'LIBRO', options: ['LIBRO','CUADERNO','LÁPIZ','PLUMA'] },
+      { img: '🍕', text: '¿Qué comida es?', answer: 'PIZZA', options: ['TORTA','PIZZA','PASTA','ARROZ'] },
+    ]
+  },
+  oraciones: {
+    title: '📖 Oraciones', type: 'multiple', timePerQ: [20, 15, 10],
+    questions: [
+      { img: '🐶', text: 'El perro es mi _____.', answer: 'AMIGO', options: ['AMIGO','COMIDA','LIBRO','ÁRBOL'] },
+      { img: '🌞', text: 'El sol brilla en el _____.', answer: 'CIELO', options: ['MAR','SUELO','CIELO','BOSQUE'] },
+      { img: '📚', text: 'Me gusta leer un _____.', answer: 'LIBRO', options: ['ZAPATO','LIBRO','SILLA','PLATO'] },
+      { img: '🍎', text: 'La manzana es de color _____.', answer: 'ROJO', options: ['AZUL','ROJO','VERDE','NEGRO'] },
+      { img: '🐟', text: 'El pez vive en el _____.', answer: 'MAR', options: ['CIELO','ÁRBOL','MAR','DESIERTO'] },
+      { img: '🌙', text: 'La luna brilla de _____.', answer: 'NOCHE', options: ['DÍA','TARDE','NOCHE','LLUVIA'] },
+      { img: '🎈', text: 'El globo vuela por el _____.', answer: 'AIRE', options: ['AGUA','FUEGO','TIERRA','AIRE'] },
+      { img: '🐦', text: 'El pájaro tiene dos _____.', answer: 'ALAS', options: ['PATAS','ALAS','OREJAS','MANOS'] },
+    ]
+  },
+  dictado: {
+    title: '✏️ Escritura', type: 'input', timePerQ: [20, 15, 10],
+    questions: [
+      { img: '🐱', text: 'Escribe el nombre de este animal:', answer: 'GATO', hint: 'Tiene 4 letras' },
+      { img: '🌞', text: 'Escribe esta palabra:', answer: 'SOL', hint: 'Tiene 3 letras' },
+      { img: '🏠', text: '¿Cómo se escribe?', answer: 'CASA', hint: 'Tiene 4 letras' },
+      { img: '🐘', text: 'Escribe el nombre del animal:', answer: 'ELEFANTE', hint: 'Tiene 8 letras' },
+      { img: '🌸', text: 'Escribe esta palabra:', answer: 'FLOR', hint: 'Tiene 4 letras' },
+      { img: '🍌', text: '¿Cómo se llama esta fruta?', answer: 'BANANA', hint: 'Tiene 6 letras' },
+      { img: '🦋', text: 'Escribe el nombre:', answer: 'MARIPOSA', hint: 'Tiene 8 letras' },
+      { img: '📖', text: 'Escribe esta palabra:', answer: 'LIBRO', hint: 'Tiene 5 letras' },
+    ]
+  }
+};
+
+let currentGame = null, currentQ = 0, score = 0, correctCount = 0, wrongCount = 0;
+let timerInterval = null, timeLeft = 15, maxTime = 15, level = 1, answered = false, gameQuestions = [];
+
+function setLevel(l, btn) {
+  level = l;
+  document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (currentGame) restartGame();
+}
+
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+function startGame(type) {
+  currentGame = type; score = 0; correctCount = 0; wrongCount = 0; currentQ = 0;
+  document.getElementById('menu-screen').style.display = 'none';
+  document.getElementById('game-screen').classList.add('active');
+  document.getElementById('results-screen').style.display = 'none';
+  document.querySelector('.timer-bar-wrap').style.display = 'block';
+  document.querySelector('.timer-label').style.display = 'block';
+  document.querySelector('.game-title').innerHTML = GAMES[type].title;
+  document.getElementById('score-val').textContent = '0';
+  gameQuestions = shuffle(GAMES[type].questions).slice(0, 6);
+  buildDots(); showQuestion();
+}
+
+function buildDots() {
+  const el = document.getElementById('progress-dots');
+  el.innerHTML = '';
+  gameQuestions.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' current' : '');
+    d.id = 'dot-' + i;
+    el.appendChild(d);
+  });
+}
+
+function updateDot(correct) {
+  const d = document.getElementById('dot-' + currentQ);
+  if (d) { d.classList.remove('current'); d.classList.add(correct ? 'done' : 'wrong-dot'); }
+  const nd = document.getElementById('dot-' + (currentQ + 1));
+  if (nd) nd.classList.add('current');
+}
+
+function showQuestion() {
+  answered = false;
+  clearInterval(timerInterval);
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').className = 'feedback-msg';
+  const g = GAMES[currentGame], q = gameQuestions[currentQ];
+  document.getElementById('q-img').textContent = q.img;
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('q-hint').textContent = q.hint || '';
+  maxTime = g.timePerQ[level - 1]; timeLeft = maxTime;
+  updateTimerBar();
+  if (g.type === 'multiple') {
+    document.getElementById('options-area').style.display = 'grid';
+    document.getElementById('input-area').style.display = 'none';
+    document.getElementById('btn-check').style.display = 'none';
+    renderOptions(q);
+  } else {
+    document.getElementById('options-area').style.display = 'none';
+    document.getElementById('input-area').style.display = 'block';
+    document.getElementById('btn-check').style.display = 'block';
+    const inp = document.getElementById('text-input');
+    inp.value = ''; inp.className = ''; inp.disabled = false; inp.focus();
+  }
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerBar();
+    if (timeLeft <= 0) { clearInterval(timerInterval); if (!answered) timeUp(); }
+  }, 1000);
+}
+
+function updateTimerBar() {
+  const pct = Math.max(0, (timeLeft / maxTime) * 100);
+  const bar = document.getElementById('timer-bar');
+  bar.style.width = pct + '%';
+  bar.style.background = pct > 60 ? '#4CAF50' : pct > 30 ? '#FF9800' : '#f44336';
+  document.getElementById('timer-text').textContent = timeLeft;
+}
+
+function renderOptions(q) {
+  const opts = shuffle(q.options);
+  const area = document.getElementById('options-area');
+  area.innerHTML = '';
+  opts.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt;
+    btn.onclick = () => selectOption(opt, q.answer, btn);
+    area.appendChild(btn);
+  });
+}
+
+function selectOption(chosen, answer, btn) {
+  if (answered) return;
+  answered = true; clearInterval(timerInterval);
+  document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+  const correct = chosen === answer;
+  if (correct) { btn.classList.add('correct'); addScore(true); }
+  else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.option-btn').forEach(b => { if (b.textContent === answer) b.classList.add('correct'); });
+    addScore(false);
+  }
+  updateDot(correct);
+  setTimeout(nextQuestion, 1400);
+}
+
+function checkInput() {
+  if (answered) return;
+  const inp = document.getElementById('text-input');
+  const val = inp.value.trim().toUpperCase();
+  if (!val) return;
+  answered = true; clearInterval(timerInterval); inp.disabled = true;
+  const q = gameQuestions[currentQ];
+  const correct = val === q.answer;
+  inp.className = correct ? 'correct' : 'wrong';
+  addScore(correct);
+  if (!correct) { document.getElementById('feedback').textContent = '✓ Era: ' + q.answer; document.getElementById('feedback').className = 'feedback-msg wrong'; }
+  updateDot(correct);
+  setTimeout(nextQuestion, 1500);
+}
+
+function timeUp() {
+  answered = true;
+  const fb = document.getElementById('feedback');
+  fb.textContent = '⏰ ¡Se acabó el tiempo!'; fb.className = 'feedback-msg wrong';
+  wrongCount++;
+  updateDot(false);
+  document.querySelectorAll('.option-btn').forEach(b => { b.disabled = true; if (b.textContent === gameQuestions[currentQ].answer) b.classList.add('correct'); });
+  const inp = document.getElementById('text-input');
+  if (inp) inp.disabled = true;
+  setTimeout(nextQuestion, 1400);
+}
+
+function addScore(correct) {
+  const fb = document.getElementById('feedback');
+  if (correct) {
+    const bonus = Math.max(1, Math.round(timeLeft / maxTime * 10));
+    score += bonus; correctCount++;
+    fb.textContent = '🌟 ¡Muy bien! +' + bonus; fb.className = 'feedback-msg correct';
+  } else {
+    wrongCount++;
+    fb.textContent = '😅 ¡Inténtalo de nuevo!'; fb.className = 'feedback-msg wrong';
+  }
+  document.getElementById('score-val').textContent = score;
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= gameQuestions.length) showResults();
+  else showQuestion();
+}
+
+function showResults() {
+  clearInterval(timerInterval);
+  document.getElementById('options-area').style.display = 'none';
+  document.getElementById('input-area').style.display = 'none';
+  document.getElementById('btn-check').style.display = 'none';
+  document.getElementById('q-img').textContent = '';
+  document.getElementById('q-text').textContent = '';
+  document.getElementById('q-hint').textContent = '';
+  document.getElementById('feedback').textContent = '';
+  document.querySelector('.timer-bar-wrap').style.display = 'none';
+  document.querySelector('.timer-label').style.display = 'none';
+  const pct = Math.round((correctCount / gameQuestions.length) * 100);
+  let emoji = '😊', title = '¡Buen intento!', sub = 'Sigue practicando';
+  if (pct >= 90) { emoji = '🏆'; title = '¡Campeón!'; sub = '¡Perfecto! Eres increíble'; }
+  else if (pct >= 70) { emoji = '⭐'; title = '¡Muy bien!'; sub = 'Vas muy bien, sigue así'; }
+  else if (pct >= 50) { emoji = '👍'; title = '¡Buen trabajo!'; sub = 'Practica un poco más'; }
+  document.getElementById('res-emoji').textContent = emoji;
+  document.getElementById('res-title').textContent = title;
+  document.getElementById('res-sub').textContent = sub;
+  document.getElementById('res-correct').textContent = correctCount;
+  document.getElementById('res-wrong').textContent = wrongCount;
+  document.getElementById('res-score').textContent = score;
+  document.getElementById('results-screen').style.display = 'block';
+}
+
+function restartGame() {
+  document.querySelector('.timer-bar-wrap').style.display = 'block';
+  document.querySelector('.timer-label').style.display = 'block';
+  startGame(currentGame);
+}
+
+function goMenu() {
+  clearInterval(timerInterval);
+  document.querySelector('.timer-bar-wrap').style.display = 'block';
+  document.querySelector('.timer-label').style.display = 'block';
+  document.getElementById('menu-screen').style.display = 'block';
+  document.getElementById('game-screen').classList.remove('active');
+}
+
+document.getElementById('text-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkInput(); });
+</script>
+</body>
+</html>
